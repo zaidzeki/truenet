@@ -83,7 +83,7 @@ def stream(headers, url, start, stop):
     resp = requests.get(url, headers=json.loads(headers), allow_redirects=True, stream=True)
     left = start
     data = b''
-    for chunk in resp.iter_content(100*1024*1024):
+    for chunk in resp.iter_content(7*1024*1024):
         if left:
             if left > len(chunk):
                 left -= len(chunk)
@@ -91,9 +91,8 @@ def stream(headers, url, start, stop):
                 data += chunk[left:]
                 left = 0
         else:
-            if len(data) < (stop-start):
-                data += chunk
-            else:
+            data += chunk
+            if len(data) > (stop-start):
                 data = data[:(stop-start)]
                 break
     data = encrypt(key, data)
